@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+const path = require('path')
 const colors = require('colors')
 const express = require('express');
 const port = process.env.PORT || 5000
@@ -19,6 +20,19 @@ app.use(errorHandler)
 
 app.use('/api/goals', goalRoutes)
 app.use('/api/user', userRoutes)
+
+// Serve Frontend
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')))
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../', 'frontend', 'build', 'index.html'))
+  })
+}else{
+  app.get('/', (req, res)=>{
+    res.send('Please set to Production')
+  })
+}
 
 app.listen(port, () => {
   console.log(`Listening on PORT ${port}`)
